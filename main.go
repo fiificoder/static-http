@@ -1,29 +1,26 @@
 package main
 
 import (
-	"flag"
+	"fmt"
 	"log"
 	"net/http"
-	"time"
-
-	"github.com/gorilla/mux"
 )
 
 func main() {
-	var dir string // taking directory 	path via command-line
+	fileServer := http.FileServer(http.Dir("./Static"))
+	http.Handle("/", fileServer)
+	http.HandleFunc("/hello", helloHandler)
 
-	flag.StringVar(&dir, "dir", ".", "the directory to serve files from. Defaults to the current dir")
-	flag.Parse()
-	r := mux.NewRouter()
-
-	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(dir))))
-
-	server := http.Server{
-		Handler:      r,
-		Addr:         "127.0.0.1:8000",
-		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  15 * time.Second,
+	fmt.Printf("Starting server at port 8080\n")
+	if err := http.ListenAndServe(":8080", nil); err != nil {
+		log.Fatal(err)
 	}
+}
 
-	log.Fatal(server.ListenAndServe())
+func helloHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "method is not supported", http.StatusNotFound)
+		return
+	}
+	fmt.Fprintf(w, "Hello World!!")
 }
