@@ -10,13 +10,12 @@ import (
 )
 
 func main() {
-	var dir string
+	var dir string // taking directory 	path via command-line
 
 	flag.StringVar(&dir, "dir", ".", "the directory to serve files from. Defaults to the current dir")
 	flag.Parse()
 	r := mux.NewRouter()
 
-	//http://localhost:8000/static/<filename>
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(dir))))
 
 	server := http.Server{
