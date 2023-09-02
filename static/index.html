@@ -1,1 +1,72 @@
-// I try :)
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GitHub User Info</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 0;
+      }
+
+      #container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      #github-form {
+        background-color: white;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <form id="github-form">
+        <h2>GitHub User Info</h2>
+        <label for="username">GitHub Username:</label>
+        <input type="text" id="username" name="username" required />
+        <button type="submit">Get Info</button>
+      </form>
+    </div>
+
+    <script>
+      document
+        .getElementById("github-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          const username = document.getElementById("username").value;
+
+          fetch(`https://api.github.com/users/${username}`)
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.message === "Not Found") {
+                alert("GitHub user not found.");
+              } else {
+                const userInfo = `
+                            <h2>${data.name}</h2>
+                            <p>Username: ${data.login}</p>
+                            <p>Followers: ${data.followers}</p>
+                            <p>Following: ${data.following}</p>
+                            <p>Public Repos: ${data.public_repos}</p>
+                            <img src="${data.avatar_url}" alt="Avatar">
+                        `;
+                document.getElementById("container").innerHTML = userInfo;
+              }
+            })
+            .catch((error) => {
+              console.error(error);
+              alert("An error occurred while fetching GitHub user data.");
+            });
+        });
+    </script>
+  </body>
+</html>
